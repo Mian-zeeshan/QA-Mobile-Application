@@ -58,7 +58,7 @@ class _InspectionSubChaptersState extends State<InspectionSubChapters> {
        String? isAttempt =  await locator.get<LocalStorageProvider>().retrieveDataByKey(subChpId);
        
         // await storage.deleteAll();
-        if(isAttempt=='true'){
+        if('false'=='true'){
 
         }
         else{

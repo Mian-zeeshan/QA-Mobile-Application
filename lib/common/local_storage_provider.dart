@@ -26,8 +26,14 @@ class LocalStorageProvider {
   }
 
   Future<dynamic> retrieveDataByKey(String key) async {
-    return await _storage.read(key: key, aOptions: _getAndroidOptions(), iOptions: iOptions);
+    return await _storage.read(key: key, aOptions: _getAndroidOptions(), iOptions: iOptions,);
   }
+ Future<String?> readDataByKey(String key) async {
+   var readData =
+     await _storage.read(key: key, aOptions: _getAndroidOptions(), iOptions: iOptions);
+ return readData;
+  }
+
   Future<void> deleteStorage() async {
       await _storage.deleteAll(aOptions: _getAndroidOptions(), iOptions: iOptions);
   }

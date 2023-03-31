@@ -8,7 +8,7 @@ class InspectionChecklist {
     return index;
   }
 
-  static List<CheckListModel> checkListAnswers = [];
+  static final List<CheckListModel> checkListAnswers = [];
 
 //static
   static addDataIntoCheckListModelList(

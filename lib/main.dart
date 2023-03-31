@@ -11,7 +11,8 @@ import 'screens/splash_screen/splash_screen.dart';
 
 List<CameraDescription>? cameras;
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+
+ WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   initServices();
   cameras = await availableCameras();
