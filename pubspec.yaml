@@ -1,0 +1,68 @@
+name: kfccheck
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.18.4 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  firebase_core: ^2.1.0
+  firebase_auth: ^4.0.2
+  firebase_storage: ^11.0.3
+  provider: ^6.0.4
+  getter: ^0.0.3
+  cloud_firestore: ^4.0.4
+  fluttertoast: ^8.1.1
+
+  intl: ^0.17.0
+  camera: ^0.10.0+4
+  image_picker: ^0.8.6
+  comment_box: ^0.0.17
+  get_it: ^7.2.0
+  percent_indicator: ^4.2.2
+  fl_chart: ^0.55.2
+  dropdown_button2: ^1.8.9
+  syncfusion_flutter_charts: ^20.3.57
+  flutter_credit_card: ^3.0.4
+  in_app_purchase: ^3.1.0
+  shared_preferences: ^2.0.15
+  flutter_secure_storage: ^8.0.0
+  flutter_svg: ^1.1.6
+  flutter_bloc: ^8.1.1
+  uuid: any
+  flutter_datetime_picker: ^1.5.1
+  flutter_switch: ^0.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - asset/
+  fonts:
+    - family: SofiaPro
+      fonts:
+        - asset: asset/fonts/sofiapro-light.otf
+    - family: ProductSans
+      fonts:
+        - asset: asset/fonts/Product_Sans_Regular.ttf
+        - asset: asset/fonts/Product_Sans_Light_300.ttf
+    - family: ProductSansBold
+      fonts:
+        - asset: asset/fonts/Product_Sans_Bold.ttf
+          weight: 700
+    - family: Montserrat
+      fonts:
+         - asset: asset/fonts/Montserrat-Regular.ttf
+    - family: MontserratBold
+      fonts:
+         - asset: asset/fonts/Montserrat-Bold.ttf
+           weight: 700
