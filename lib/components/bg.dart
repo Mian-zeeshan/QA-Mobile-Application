@@ -9,6 +9,7 @@ class Background extends StatelessWidget {
   final double? childPositionBottom;
   final double? childPositionRight;
   final double? childPositionLeft;
+  final bool isBranchScreen;
 
   const Background({
     super.key,
@@ -18,6 +19,7 @@ class Background extends StatelessWidget {
     this.childPositionLeft,
     this.childPositionRight,
     this.childPositionUp,
+    this.isBranchScreen=false
   });
 
   @override
@@ -37,7 +39,8 @@ class Background extends StatelessWidget {
                     InkWell(
                       child: const Icon(Icons.arrow_back_ios, color: white),
                       onTap: () {
-                        Navigator.pop(context);
+                        isBranchScreen==false?
+                        Navigator.pop(context):false;
                       },
                     ),
                     Text(

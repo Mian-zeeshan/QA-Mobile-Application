@@ -13,8 +13,10 @@ import '../../services/services.dart';
 import 'inspection_screen.dart';
 
 class InspectionSubChapters extends StatefulWidget {
-  String? chaptersId;
-  InspectionSubChapters({super.key, required this.chaptersId});
+  String chaptersId;
+  String standardId;
+  int chapterListLength;
+  InspectionSubChapters({super.key, required this.chaptersId,required this.standardId, this.chapterListLength=0,});
   @override
   State<InspectionSubChapters> createState() => _InspectionSubChaptersState();
 }
@@ -22,9 +24,13 @@ class InspectionSubChapters extends StatefulWidget {
 class _InspectionSubChaptersState extends State<InspectionSubChapters> {
   List<dynamic> branches = [];
   @override
+  
+  
   void initState() {
+
+    
     super.initState();
-     
+
     // getData();
   }
 
@@ -40,33 +46,37 @@ class _InspectionSubChaptersState extends State<InspectionSubChapters> {
   var branch = locator.get<LocalUser>();
   int groupValue = -1;
   bool isfalse = false;
-  
+   String? isAttempt;
 
   @override
   Widget build(BuildContext context) {
     return InspectionComponent(
       collection: FirebaseFirestore.instance
           .collection('AssigningSubChaptersCopy')
-          // .where('customerId', isEqualTo: customerProvider.customerId.toString())
-          // .where('branchid', isEqualTo: branchProvider.branchId.toString())
           .where('chpid', isEqualTo: widget.chaptersId)
           .snapshots(),
       pageTitle: 'SubChapters',
-      route: (id,nam) async{
-        String subChpId=id;
-         const storage = FlutterSecureStorage();
-       String? isAttempt =  await locator.get<LocalStorageProvider>().retrieveDataByKey(subChpId);
-       
-        // await storage.deleteAll();
-        if('false'=='true'){
+      route: (id, nam, length) async {
+        String subChpId = id;
+         isAttempt = await locator.get<LocalStorageProvider>().retrieveDataByKey(subChpId);
 
+        if (isAttempt == 'true') {
         }
-        else{
-  routeTo(InspectionScreen(subChpId: id,title: nam,), context: context);
+         else {
+          // ignore: use_build_context_synchronously
+          routeTo(
+              InspectionScreen(
+                subChpId: id,
+                title: nam,
+                length: length,
+                standardId: widget.standardId,
+                chapterId:widget.chaptersId ,
+                chapterListLength: widget.chapterListLength,
+              ),
+              context: context);
         }
-        
-        
       },
+      
     );
   }
 }

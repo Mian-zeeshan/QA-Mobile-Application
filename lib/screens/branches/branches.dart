@@ -167,6 +167,8 @@ class _BranchesState extends State<Branches> {
                  
                 },
               )),
-        ));
+        ),
+        
+        isBranchScreen: true,);
   }
 }

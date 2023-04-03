@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:kfccheck/common/common.dart';
 import 'package:kfccheck/common/const.dart';
@@ -114,190 +116,222 @@ class _QA_walkState extends State<QA_walk> {
   ];
   @override
   Widget build(BuildContext context) {
-    return QaScaffold(
-      button: GlobalButton(
-        title: 'Start QA Walk',
-        onTap: () {
-          routeTo(Branches(), context: context);
-        },
-      ),
-      child: SingleChildScrollView(
-        child: Column(children: [
-          Stack(children: [
-            Container(
-              color: black,
-              height: 231,
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          child: Text(
-                            'Hello ${locator.get<LocalUser>().userData['firstName']}',
-                            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: yellow),
-                          ),
-                        ),
-                        GestureDetector(
-                          child: Container(
-                            width: 38,
-                            height: 38,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: GREEN,
-                            ),
-                            child: Center(
-                                child: Text(
-                              locator.get<LocalUser>().userData['firstName'][0],
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w400, color: Color.fromRGBO(51, 51, 51, 1)),
-                            )),
-                          ),
-                          onTap: () {
-                            showAlertDialog(context);
-                          },
-                        ),
-                      ],
-                    ),
-                    const Text('Have a great day!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300, color: Gray))
-                  ],
+    return WillPopScope(
+      onWillPop: () async{
+             final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Do you want to exit from app?'),
+              actionsAlignment: MainAxisAlignment.spaceBetween,
+              actions: [
+                TextButton(
+                  onPressed: () {
+                     SystemNavigator.pop();
+                    //Navigator.pop(context, true);
+                  },
+                  child: const Text('Yes'),
                 ),
-              ),
-            ),
-            Positioned(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 150, left: 10, right: 10),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(19)),
-                    color: Colors.white,
-                  ),
-                  height: 241,
-                  width: MediaQuery.of(context).size.width,
-                  child: const Padding(
-                    padding: EdgeInsets.only(top: 20, left: 20),
-                    child: Text(
-                      'Total Walks',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: kala, fontStyle: FontStyle.normal),
-                    ),
-                  ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  child: const Text('No'),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 219, left: 150),
-              child: CircularPercentIndicator(
-                radius: 40,
-                lineWidth: 20.0,
-                percent: 0.7,
-                animation: true,
-                backgroundColor: lightgray,
-                circularStrokeCap: CircularStrokeCap.round,
-                progressColor: GREEN,
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(top: 334, left: 39),
-              child: Text(
-                'Open Actions =',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: kala, fontStyle: FontStyle.normal),
-              ),
-            ),
-          ]),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: Container(
-              height: 270,
-              width: 385,
-              decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(19)), color: white),
-              child: Column(children: [
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
+              ],
+            );
+          },
+        );
+        return shouldPop!;
+      },
+      child: QaScaffold(
+        button: GlobalButton(
+          title: 'Start QA Walk',
+          onTap: () async{
+            
+            routeTo(Branches(), context: context);
+          },
+        ),
+        child: SingleChildScrollView(
+          child: Column(children: [
+            Stack(children: [
+              Container(
+                color: black,
+                height: 231,
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Walk Trends',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: kala,
-                        ),
-                      ),
                       const SizedBox(
-                        width: 30,
+                        height: 40,
                       ),
-                      Container(
-                        height: 30,
-                        width: 185,
-                        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(6)), color: light),
-                        child: DropdownButton(
-                          hint: const Padding(
-                            padding: EdgeInsets.only(left: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
                             child: Text(
-                              'Select a branch',
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: lighht),
+                             // 'Hello ${locator.get<LocalUser>().userData['firstName']}',
+                             'Helo',
+                              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: yellow),
                             ),
                           ),
-                          underline: Container(),
-                          iconSize: 25,
-                          icon: const Padding(
-                            padding: EdgeInsets.only(right: 15),
-                            child: Icon(
-                              Icons.arrow_drop_down,
-                              color: Black,
+                          GestureDetector(
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: GREEN,
+                              ),
+                              child: Center(
+                                  child: Text(
+                               // locator.get<LocalUser>().userData['firstName'][0],
+                               'zeeshan',
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w400, color: Color.fromRGBO(51, 51, 51, 1)),
+                              )),
                             ),
+                            onTap: () {
+                              showAlertDialog(context);
+                            },
                           ),
-                          value: _selectedbranches,
-                          onChanged: (newValue) {
-                            setState(() {
-                              _selectedbranches = newValue!;
-                            });
-                          },
-                          items: _branches.map((e) {
-                            return DropdownMenuItem(
-                              child: new Text(e),
-                              value: e,
-                            );
-                          }).toList(),
-                        ),
-                      )
+                        ],
+                      ),
+                      const Text('Have a great day!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300, color: Gray))
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
+              ),
+              Positioned(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 150, left: 10, right: 10),
                   child: Container(
-                    height: 209,
-                    width: 340,
-                    child: SfCartesianChart(
-                        primaryXAxis: CategoryAxis(
-                          arrangeByIndex: false,
-                          //rangePadding: ChartRangePadding.additional
-                        ),
-                        series: <ChartSeries<ChartData, String>>[
-                          ColumnSeries<ChartData, String>(
-                              // isTrackVisible: true,
-                              color: GRAY,
-                              dataSource: chartData,
-                              xValueMapper: (ChartData data, io) => data.x,
-                              yValueMapper: (ChartData data, io) => data.y)
-                        ]),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(19)),
+                      color: Colors.white,
+                    ),
+                    height: 241,
+                    width: MediaQuery.of(context).size.width,
+                    child: const Padding(
+                      padding: EdgeInsets.only(top: 20, left: 20),
+                      child: Text(
+                        'Total Walks',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: kala, fontStyle: FontStyle.normal),
+                      ),
+                    ),
                   ),
                 ),
-              ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 219, left: 150),
+                child: CircularPercentIndicator(
+                  radius: 40,
+                  lineWidth: 20.0,
+                  percent: 0.7,
+                  animation: true,
+                  backgroundColor: lightgray,
+                  circularStrokeCap: CircularStrokeCap.round,
+                  progressColor: GREEN,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(top: 334, left: 39),
+                child: Text(
+                  'Open Actions =',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: kala, fontStyle: FontStyle.normal),
+                ),
+              ),
+            ]),
+            const SizedBox(
+              height: 20,
             ),
-          ),
-        ]),
+            Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: Container(
+                height: 270,
+                width: 385,
+                decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(19)), color: white),
+                child: Column(children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Walk Trends',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: kala,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 30,
+                        ),
+                        Container(
+                          height: 30,
+                          width: 185,
+                          decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(6)), color: light),
+                          child: DropdownButton(
+                            hint: const Padding(
+                              padding: EdgeInsets.only(left: 5),
+                              child: Text(
+                                'Select a branch',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: lighht),
+                              ),
+                            ),
+                            underline: Container(),
+                            iconSize: 25,
+                            icon: const Padding(
+                              padding: EdgeInsets.only(right: 15),
+                              child: Icon(
+                                Icons.arrow_drop_down,
+                                color: Black,
+                              ),
+                            ),
+                            value: _selectedbranches,
+                            onChanged: (newValue) {
+                              setState(() {
+                                _selectedbranches = newValue!;
+                              });
+                            },
+                            items: _branches.map((e) {
+                              return DropdownMenuItem(
+                                child: new Text(e),
+                                value: e,
+                              );
+                            }).toList(),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Container(
+                      height: 209,
+                      width: 340,
+                      child: SfCartesianChart(
+                          primaryXAxis: CategoryAxis(
+                            arrangeByIndex: false,
+                            //rangePadding: ChartRangePadding.additional
+                          ),
+                          series: <ChartSeries<ChartData, String>>[
+                            ColumnSeries<ChartData, String>(
+                                // isTrackVisible: true,
+                                color: GRAY,
+                                dataSource: chartData,
+                                xValueMapper: (ChartData data, io) => data.x,
+                                yValueMapper: (ChartData data, io) => data.y)
+                          ]),
+                    ),
+                  ),
+                ]),
+              ),
+            ),
+          ]),
+        ),
       ),
     );
   }
