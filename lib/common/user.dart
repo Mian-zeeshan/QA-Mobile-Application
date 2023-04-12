@@ -10,6 +10,7 @@ import '../provider/branch_provider.dart';
 import '../provider/customer_provider.dart';
 import '../provider/globel_provider.dart';
 import '../provider/login_provider.dart';
+import '../screens/qa_walk.dart';
 import '../services/services.dart';
 import 'common.dart';
 import 'local_storage_provider.dart';
@@ -154,7 +155,7 @@ class LocalUser {
             branchProvider.setBranchId(branchId);
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const Branches()),
+              MaterialPageRoute(builder: (context) => const QA_walk()),
             );
           }
         });

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kfccheck/common/common.dart';
 import 'package:kfccheck/common/user.dart';
 import 'package:provider/provider.dart';
+import '../../common/local_storage_provider.dart';
 import '../../components/inspections_page.dart';
 import '../../provider/branch_provider.dart';
 import '../../provider/customer_provider.dart';
@@ -52,10 +53,13 @@ class _InspectionStandardsState extends State<InspectionStandards> {
           .where('id', whereIn: localUserHandler.templatesIdsList)
           .snapshots(),
       pageTitle: 'Standard',
-      route: (id, name) async {
+      route: (id, name,length) async {
         await getAssignsTemplatesIdsd(context, id);
-
-        routeTo(InspectionChapters(standardId: id), context: context);
+          String? isAttempt;
+        isAttempt = await locator.get<LocalStorageProvider>().retrieveDataByKey(id);
+        if(isAttempt=='true'){}
+        else{routeTo(InspectionChapters(standardId: id,), context: context);}
+        
       },
     );
   }

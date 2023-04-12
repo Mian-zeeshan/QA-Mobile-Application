@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:kfccheck/blocs/bloc/inspection_bloc.dart';
 import 'package:kfccheck/common/const.dart';
 import 'package:kfccheck/components/bg.dart';
 import 'package:kfccheck/screens/comment_screen.dart';
@@ -16,22 +17,33 @@ import 'package:kfccheck/screens/roles.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:uuid/uuid.dart';
+import '../../common/common.dart';
 import '../../common/local_storage_provider.dart';
+import '../../config/config.dart';
 import '../../models/inspectionChecklistModel.dart';
 import '../../provider/customer_provider.dart';
 import '../../provider/globel_provider.dart';
 import '../../provider/login_provider.dart';
 import '../../services/services.dart';
+import 'inspection_chapters.dart';
+import 'inspection_standards.dart';
 
 class InspectionScreen extends StatefulWidget {
   final String subChpId;
   final String title;
+  final int length;
+  final String standardId;
+  final String chapterId;
+  final int chapterListLength;
 
-  const InspectionScreen({
-    super.key,
-    required this.subChpId,
-    required this.title,
-  });
+  const InspectionScreen(
+      {super.key,
+      required this.subChpId,
+      required this.title,
+      required this.length,
+      required this.standardId,
+      required this.chapterId,
+      this.chapterListLength = 0});
 
   @override
   State<InspectionScreen> createState() => _InspectionScreenState();
@@ -449,114 +461,76 @@ class _InspectionScreenState extends State<InspectionScreen> {
                 child: MaterialButton(
                   color: Colors.black,
                   onPressed: () async {
-                    final _storage = const FlutterSecureStorage();
-                    // String encodedPeople = await locator
-                    //     .get<LocalStorageProvider>()
-                    //     .retrieveDataByKey('listOfKeys');
 
-                    // print(encodedPeople);
-                    // List<dynamic> decodedPeople = json.decode(encodedPeople);
-                    // List<CheckListModel> people = decodedPeople.map((p) => CheckListModel.fromJson(p)).toList();
-                    // for (var d in people) {
-                    //   print(d.toMap());
-                    // }
-                    // await storage.deleteAll();
-                    // String email = await locator
-                    //     .get<LocalStorageProvider>()
-                    //     .retrieveDataByKey('251b2a1a-31a4-46ba-80f1-891707347aab');
-                    //     print(email);
 
-                    // String? encodedPeople = await storage.read(key: '251b2a1a-31a4-46ba-80f1-891707347aab');
-                    // List<dynamic> decodedPeople = json.decode(encodedPeople!);
-                    // List<CheckListModel> people = decodedPeople.map((p) => CheckListModel.fromJson(p)).toList();
-                    // for (var d in people) {
-                    //   print(d.toMap());
-                    // }
-                    // print(email);
-
-                    // for (var d in InspectionChecklist.checkListAnswers) {
-                    //   print(d.toMap());
-                    // }
-                    // InspectionChecklist.checkListAnswers.clear();
-                    // globalProvider.clearisSelectedoption();
-
-                    // var globelProvider = Provider.of<GlobelProvider>(context, listen: false);
-                    //  await   storage.deleteAll();
 //todo:--------------------------------------------------------
-                    var email = await locator.get<LocalStorageProvider>().retrieveDataByKey('ali1');
-                     print(email);
-                    List<dynamic> decodedPeople = json.decode(email);
+                    // var email = await locator.get<LocalStorageProvider>().retrieveDataByKey('ali1');
+                    //  print(email);
+                    // List<dynamic> decodedPeople = json.decode(email);
 
-                    List<CheckListModel> myModelList =
-                        decodedPeople.map((map) => CheckListModel.fromJson(map)).toList();
-                    for (var d in myModelList) {
-                      print(d.value);
-                    }
+                    // List<CheckListModel> myModelList =
+                    //     decodedPeople.map((map) => CheckListModel.fromJson(map)).toList();
+                    // for (var d in myModelList) {
+                    //   print(d.value);
+                    // }
                     //---------------------------------------------------------
 
-//final data = await storage.read(key: '251b2a1a-31a4-46ba-80f1-891707347aab');
-// final List<dynamic> retrievedMappedList = jsonDecode(data!);
-// final List<CheckListModel> retrievedList = retrievedMappedList.map((e) => CheckListModel.fromJson(e)).toList();
 
-//  const storage = FlutterSecureStorage();
-//         String? isAttempt= await storage.read(key: widget.subChpId);
-                    //   print(email);
 
-                    // globelProvider.clearisSelectedoption();
-                    // InspectionChecklist.checkListAnswers.clear();
-                    //   const storage = FlutterSecureStorage();
-                    // String? stringOfItems = await storage.read(key: 'listOfItems');
-                    // List<dynamic> listOfItems = jsonDecode(stringOfItems!);
-                    // print(listOfItems);
-
-// String? stringDataOfKeys = await storage.read(key: 'zeeshan');
-//  List<dynamic> listDataOfKeys = await jsonDecode(stringDataOfKeys!);
-//  print(listDataOfKeys);
-
-//Todo:this code used for confirmation of successfully submitted checklists
-                    // const storage = FlutterSecureStorage();
-                    // String submitted = 'true';
-                    // await storage.write(key: widget.subChpId, value: submitted);
-
-                    //----------------------------------
+                     // await   storage.deleteAll();
+               
 
                     //todo: this code used for write the checklists into local storage with subchapter key values
-                    //   if (_formKey.currentState!.validate()) {
-                    //     String subchapterId = widget.subChpId;
-                    //     await saveChecklistsDataInLocalStorage(subchapterId);
+                    if (_formKey.currentState!.validate()) {
+                      String subchapterId = widget.subChpId;
+                      await saveChecklistsDataInLocalStorage();
 
-                    //    // await savesAllSubChaptersKeys(subchapterId);
-                    //   //     String submitted = 'true';
-                    //   // await locator.get<LocalStorageProvider>().saveByKey(subchapterId, data: submitted);
-                    // globalProvider.clearisSelectedoption();
-                    // InspectionChecklist.checkListAnswers.clear();
-                    // print('sucessfully complete all function');
-                    //  // Navigator.pop(context);
+                      await savesAllKeys(subchapterId, widget.chapterId);
+                      String submitted = 'true';
+                      await locator.get<LocalStorageProvider>().saveByKey(subchapterId, data: submitted);
+                      globalProvider.clearisSelectedoption();
+                      InspectionChecklist.checkListAnswers.clear();
 
-                    //   }
+                      var subChpListLength =
+                          await locator.get<LocalStorageProvider>().retrieveDataByKey(widget.chapterId);
 
-                    //ToDo:this code use for insert data in the firebase
-                    // if (_formKey.currentState!.validate()) {
-                    // final CollectionReference assignDataCollection =
-                    //     FirebaseFirestore.instance.collection('AssignmentData');
-                    // for (var data in InspectionChecklist.checkListAnswers) {
-                    //   var uuid = const Uuid().v4();
-                    //   assignDataCollection.doc(data.id).set(data.toMap());
-                    // }
-                    //-----------------------------------------
+                      List<dynamic> lengthSubChapterKeys = jsonDecode(subChpListLength);
+                      List<String> subChaptersKeys = lengthSubChapterKeys.cast();
+                      if (subChaptersKeys.length == widget.length) {
+                        await savesAllKeys(widget.chapterId, widget.standardId);
+                        String submitted = 'true';
+                        await locator.get<LocalStorageProvider>().saveByKey(widget.chapterId, data: submitted);
 
-                    //Todo:this code used for read list of objects data
-//                     String? encodedPeople = await storage.read(key: 'questionlist');
-// List<dynamic> decodedPeople = json.decode(encodedPeople!);
-// List<CheckListModel> people = decodedPeople.map((p) => CheckListModel.fromJson(p)).toList();
-//   for(var d in people){
-//     print(d.toMap());
-//   }
-//
-//                       globelProvider.clearisSelectedoption();
-//                      InspectionChecklist.checkListAnswers.clear();
+                        var keyList = await locator.get<LocalStorageProvider>().retrieveDataByKey(widget.standardId);
 
-                    //--------------------------------
+                        List<dynamic> lengthOfChapterList = jsonDecode(keyList);
+                        List<String> chaptersKeysListLength = lengthOfChapterList.cast();
+                        if (chaptersKeysListLength.length == widget.chapterListLength) {
+                          String submitted = 'true';
+                          await locator.get<LocalStorageProvider>().saveByKey(widget.standardId, data: submitted);
+                          // ignore: use_build_context_synchronously
+                          routeTo(InspectionStandards(), context: context);
+
+                          showAlertDialog(context);
+                        } else {
+                          // ignore: use_build_context_synchronously
+                          routeTo(
+                              InspectionChapters(
+                                standardId: widget.standardId,
+                              ),
+                              context: context);
+                        }
+
+                        // ignore: use_build_context_synchronously
+                      } else {
+                        // ignore: use_build_context_synchronously
+                        Navigator.pop(context);
+                      }
+                      // ignore: use_build_context_synchronously
+                    }
+
+   
+
                   },
                   child: const Center(
                     child: Text(
@@ -573,8 +547,8 @@ class _InspectionScreenState extends State<InspectionScreen> {
     );
   }
 
-  Future<void> saveChecklistsDataInLocalStorage(String subchapterId) async {
-    var email = await locator.get<LocalStorageProvider>().retrieveDataByKey('ali1');
+  Future<void> saveChecklistsDataInLocalStorage() async {
+    var email = await locator.get<LocalStorageProvider>().retrieveDataByKey('checkListLocalyData');
     if (email != null) {
       List<dynamic> decodedPeople = json.decode(email);
 
@@ -583,15 +557,15 @@ class _InspectionScreenState extends State<InspectionScreen> {
       final List<Map<String, dynamic>> updatedMappedList =
           List<Map<String, dynamic>>.from(myModelList.map((e) => e.toMap()))
             ..addAll(InspectionChecklist.checkListAnswers.map((e) => e.toMap()));
-             await storage.write(key: 'ali1', value: json.encode(updatedMappedList));
-              print('sucee fuly add second time');
+      await storage.write(key: 'checkListLocalyData', value: json.encode(updatedMappedList));
+      print('sucee fuly add second time');
 
       // String checkListData = json.encode(myModelList.map((e) => e.toMap()).toList()).a;
     } else {
-      String checkListData = await  json.encode(InspectionChecklist.checkListAnswers.map((e) => e.toMap()).toList());
+      String checkListData = await json.encode(InspectionChecklist.checkListAnswers.map((e) => e.toMap()).toList());
       // var email = await locator.get<LocalStorageProvider>().retrieveDataByKey('zeeshan');
 
-      await storage.write(key: 'ali1', value: (checkListData));
+      await storage.write(key: 'checkListLocalyData', value: (checkListData));
       print('sucessfully wriote list first time');
     }
 
@@ -601,22 +575,23 @@ class _InspectionScreenState extends State<InspectionScreen> {
     // // await storage.write(key: subchapterId, value: encodedChecklistsData);
   }
 
-  Future<void> savesAllSubChaptersKeys(String subchapterId) async {
-    String key = subchapterId;
+  Future<void> savesAllKeys(String subchapterId, String key) async {
+    String subChapterkeyValue = subchapterId;
     List<String> listOfKeys = [];
-    String? stringDataOfKeys = await storage.read(key: 'listOfKeys');
-    if (stringDataOfKeys == null) {
-      listOfKeys.add(key);
-      await storage.write(key: 'listOfKeys', value: jsonEncode(listOfKeys));
+
+    var keyList = await locator.get<LocalStorageProvider>().retrieveDataByKey(key);
+    if (keyList == null) {
+      listOfKeys.add(subChapterkeyValue);
+      await storage.write(key: key, value: jsonEncode(listOfKeys));
       listOfKeys.clear();
       print('first time execute');
     } else {
-      List<dynamic> listDataOfKeys = await jsonDecode(stringDataOfKeys);
+      List<dynamic> listDataOfKeys = await jsonDecode(keyList);
       List<String> swapKeysListOfStringType = [];
       swapKeysListOfStringType.addAll(listDataOfKeys.cast<String>());
-      swapKeysListOfStringType.add(key);
+      swapKeysListOfStringType.add(subChapterkeyValue);
 
-      await storage.write(key: 'listOfKeys', value: jsonEncode(swapKeysListOfStringType));
+      await storage.write(key: key, value: jsonEncode(swapKeysListOfStringType));
 
       listDataOfKeys.clear();
       swapKeysListOfStringType.clear();

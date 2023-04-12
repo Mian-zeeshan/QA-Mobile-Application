@@ -5,6 +5,7 @@ import 'package:kfccheck/provider/branch_provider.dart';
 import 'package:kfccheck/provider/customer_provider.dart';
 import 'package:kfccheck/provider/globel_provider.dart';
 import 'package:kfccheck/provider/login_provider.dart';
+import 'package:kfccheck/screens/done.dart';
 import 'package:kfccheck/services/services.dart';
 import 'package:provider/provider.dart';
 import 'screens/splash_screen/splash_screen.dart';
@@ -49,7 +50,7 @@ ChangeNotifierProvider(
           primarySwatch: Colors.red,
         ),
         debugShowCheckedModeBanner: false,
-        home: const SplashScreen(),
+        home:  SplashScreen(),
       ),
     );
   }
