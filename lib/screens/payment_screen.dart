@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_credit_card/credit_card_form.dart';
-import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:kfccheck/common/const.dart';
 
 class PaymentMethod extends StatefulWidget {

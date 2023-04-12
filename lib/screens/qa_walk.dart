@@ -6,14 +6,15 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:kfccheck/common/common.dart';
 import 'package:kfccheck/common/const.dart';
-import 'package:kfccheck/common/user.dart';
 import 'package:kfccheck/components/global_button.dart';
-import 'package:kfccheck/screens/branches/branches.dart';
-import 'package:kfccheck/services/services.dart';
+import 'package:kfccheck/provider/branch_provider.dart';
+import 'package:kfccheck/screens/assign_walk/assign_walk.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../components/qa_scaffold.dart';
+import '../config/config.dart';
 
 class QA_walk extends StatefulWidget {
   const QA_walk({super.key});
@@ -108,12 +109,21 @@ class _QA_walkState extends State<QA_walk> {
   final User = FirebaseAuth.instance.currentUser;
   final formKey = GlobalKey<FormState>();
 
-  final List<ChartData> chartData = [
-    ChartData('week 1', 10),
-    ChartData('week 2', 10),
-    ChartData('week 3', 10),
-    ChartData('week 4', 10),
+  final List<ChartData> chartDummyData = [
+    ChartData('week 1', 1),
+    ChartData('week 2', 1),
+    ChartData('week 3', 1),
+    ChartData('week 4', 1),
   ];
+ var storage = FlutterSecureStorage();
+  @override
+  void initState() {
+
+    AppConfig.getWalkDetailByWeek(context);
+
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -148,11 +158,11 @@ class _QA_walkState extends State<QA_walk> {
         button: GlobalButton(
           title: 'Start QA Walk',
           onTap: () async{
-            
-            routeTo(Branches(), context: context);
+            // await   storage.deleteAll();
+            routeTo(AssignWalk(), context: context);
           },
         ),
-        child: SingleChildScrollView(
+        child: SingleChildScrollView( 
           child: Column(children: [
             Stack(children: [
               Container(
@@ -223,24 +233,41 @@ class _QA_walkState extends State<QA_walk> {
                   ),
                 ),
               ),
-              Padding(
+              FutureBuilder(
+                  future: AppConfig.getTotalWalk(context),
+                  builder: (context, snapshot) {
+                    
+                  return Padding(
                 padding: const EdgeInsets.only(top: 219, left: 150),
                 child: CircularPercentIndicator(
                   radius: 40,
                   lineWidth: 20.0,
-                  percent: 0.7,
+                  percent: snapshot.hasData? double.parse('0.'+snapshot.data.toString()):0.0,
                   animation: true,
                   backgroundColor: lightgray,
                   circularStrokeCap: CircularStrokeCap.round,
                   progressColor: GREEN,
                 ),
-              ),
-              const Padding(
+              );
+              
+            
+                },),
+              
+              
+               Padding(
                 padding: EdgeInsets.only(top: 334, left: 39),
-                child: Text(
-                  'Open Actions =',
+                child: FutureBuilder(
+                  future: AppConfig.getTotalWalk(context),
+                  builder: (context, snapshot) {
+                    
+                  return Text(
+                  'Open Actions = ${snapshot.data??0}',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: kala, fontStyle: FontStyle.normal),
-                ),
+                );
+            
+                },)
+                
+                
               ),
             ]),
             const SizedBox(
@@ -298,8 +325,8 @@ class _QA_walkState extends State<QA_walk> {
                             },
                             items: _branches.map((e) {
                               return DropdownMenuItem(
-                                child: new Text(e),
                                 value: e,
+                                child: Text(e),
                               );
                             }).toList(),
                           ),
@@ -307,26 +334,34 @@ class _QA_walkState extends State<QA_walk> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Container(
-                      height: 209,
-                      width: 340,
-                      child: SfCartesianChart(
-                          primaryXAxis: CategoryAxis(
-                            arrangeByIndex: false,
-                            //rangePadding: ChartRangePadding.additional
-                          ),
-                          series: <ChartSeries<ChartData, String>>[
-                            ColumnSeries<ChartData, String>(
-                                // isTrackVisible: true,
-                                color: GRAY,
-                                dataSource: chartData,
-                                xValueMapper: (ChartData data, io) => data.x,
-                                yValueMapper: (ChartData data, io) => data.y)
-                          ]),
-                    ),
+                 
+                   Consumer<BranchProvider>(builder: (context, value, child) {
+                     return   Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: SizedBox(
+                    height: 209,
+                    width: 340,
+                    child: SfCartesianChart(
+                        primaryXAxis: CategoryAxis(
+                          arrangeByIndex: false,
+                          //rangePadding: ChartRangePadding.additional
+                        ),
+                        series: <ChartSeries<ChartData, String>>[
+                          ColumnSeries<ChartData, String>(
+                              // isTrackVisible: true,
+                              color: GRAY,
+                              dataSource:value.chartData,
+                              xValueMapper: (ChartData data, String) => data.x,
+                              yValueMapper: (ChartData data, int) => data.y)
+                        ]),
                   ),
+                  );
+                 
+                 
+                   },)
+                
+               
+               
                 ]),
               ),
             ),
@@ -340,5 +375,5 @@ class _QA_walkState extends State<QA_walk> {
 class ChartData {
   ChartData(this.x, this.y);
   final String x;
-  final double? y;
+  final int y;
 }

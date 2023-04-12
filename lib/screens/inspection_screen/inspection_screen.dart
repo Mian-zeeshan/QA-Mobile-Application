@@ -27,11 +27,12 @@ import '../../provider/login_provider.dart';
 import '../../services/services.dart';
 import 'inspection_chapters.dart';
 import 'inspection_standards.dart';
+import 'inspection_subchapters.dart';
 
 class InspectionScreen extends StatefulWidget {
   final String subChpId;
   final String title;
-  final int length;
+  final int subChaptersListLength;
   final String standardId;
   final String chapterId;
   final int chapterListLength;
@@ -40,7 +41,7 @@ class InspectionScreen extends StatefulWidget {
       {super.key,
       required this.subChpId,
       required this.title,
-      required this.length,
+      required this.subChaptersListLength,
       required this.standardId,
       required this.chapterId,
       this.chapterListLength = 0});
@@ -244,7 +245,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                                 },
                                               ))
                                           : snapshot.data!.docs[index]['DataType'] == 'Numeric'
-                                              ? numericAnswerWidget(
+                                              ? AppConfig.numericAnswerWidget(
                                                   snapshot.data!.docs[index]['questionId'], index, loginProvider)
                                               : snapshot.data!.docs[index]['DataType'] == 'Boolean'
                                                   ? SizedBox(
@@ -461,31 +462,15 @@ class _InspectionScreenState extends State<InspectionScreen> {
                 child: MaterialButton(
                   color: Colors.black,
                   onPressed: () async {
-
-
-//todo:--------------------------------------------------------
-                    // var email = await locator.get<LocalStorageProvider>().retrieveDataByKey('ali1');
-                    //  print(email);
-                    // List<dynamic> decodedPeople = json.decode(email);
-
-                    // List<CheckListModel> myModelList =
-                    //     decodedPeople.map((map) => CheckListModel.fromJson(map)).toList();
-                    // for (var d in myModelList) {
-                    //   print(d.value);
-                    // }
-                    //---------------------------------------------------------
-
-
-
-                     // await   storage.deleteAll();
-               
+                    // await   storage.deleteAll();
 
                     //todo: this code used for write the checklists into local storage with subchapter key values
+
                     if (_formKey.currentState!.validate()) {
                       String subchapterId = widget.subChpId;
-                      await saveChecklistsDataInLocalStorage();
+                      await AppConfig.saveChecklistsDataInLocalStorage();
 
-                      await savesAllKeys(subchapterId, widget.chapterId);
+                      await AppConfig.savesAllLocallyStorageKeys(subchapterId, widget.chapterId);
                       String submitted = 'true';
                       await locator.get<LocalStorageProvider>().saveByKey(subchapterId, data: submitted);
                       globalProvider.clearisSelectedoption();
@@ -496,8 +481,9 @@ class _InspectionScreenState extends State<InspectionScreen> {
 
                       List<dynamic> lengthSubChapterKeys = jsonDecode(subChpListLength);
                       List<String> subChaptersKeys = lengthSubChapterKeys.cast();
-                      if (subChaptersKeys.length == widget.length) {
-                        await savesAllKeys(widget.chapterId, widget.standardId);
+
+                      if (subChaptersKeys.length == widget.subChaptersListLength) {
+                        await AppConfig.savesAllLocallyStorageKeys(widget.chapterId, widget.standardId);
                         String submitted = 'true';
                         await locator.get<LocalStorageProvider>().saveByKey(widget.chapterId, data: submitted);
 
@@ -524,13 +510,16 @@ class _InspectionScreenState extends State<InspectionScreen> {
                         // ignore: use_build_context_synchronously
                       } else {
                         // ignore: use_build_context_synchronously
-                        Navigator.pop(context);
+                        routeTo(
+                            InspectionSubChapters(
+                              standardId: widget.standardId,
+                              chaptersId: widget.chapterId,
+                              chapterListLength: widget.chapterListLength,
+                            ),
+                            context: context);
                       }
                       // ignore: use_build_context_synchronously
                     }
-
-   
-
                   },
                   child: const Center(
                     child: Text(
@@ -543,126 +532,6 @@ class _InspectionScreenState extends State<InspectionScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Future<void> saveChecklistsDataInLocalStorage() async {
-    var email = await locator.get<LocalStorageProvider>().retrieveDataByKey('checkListLocalyData');
-    if (email != null) {
-      List<dynamic> decodedPeople = json.decode(email);
-
-      List<CheckListModel> myModelList = decodedPeople.map((map) => CheckListModel.fromJson(map)).toList();
-
-      final List<Map<String, dynamic>> updatedMappedList =
-          List<Map<String, dynamic>>.from(myModelList.map((e) => e.toMap()))
-            ..addAll(InspectionChecklist.checkListAnswers.map((e) => e.toMap()));
-      await storage.write(key: 'checkListLocalyData', value: json.encode(updatedMappedList));
-      print('sucee fuly add second time');
-
-      // String checkListData = json.encode(myModelList.map((e) => e.toMap()).toList()).a;
-    } else {
-      String checkListData = await json.encode(InspectionChecklist.checkListAnswers.map((e) => e.toMap()).toList());
-      // var email = await locator.get<LocalStorageProvider>().retrieveDataByKey('zeeshan');
-
-      await storage.write(key: 'checkListLocalyData', value: (checkListData));
-      print('sucessfully wriote list first time');
-    }
-
-    // String encodedChecklistsData = json.encode(InspectionChecklist.checkListAnswers.map((p) => p.toMap()).toList());
-
-    // await locator.get<LocalStorageProvider>().saveByKey(subchapterId, data: encodedChecklistsData);
-    // // await storage.write(key: subchapterId, value: encodedChecklistsData);
-  }
-
-  Future<void> savesAllKeys(String subchapterId, String key) async {
-    String subChapterkeyValue = subchapterId;
-    List<String> listOfKeys = [];
-
-    var keyList = await locator.get<LocalStorageProvider>().retrieveDataByKey(key);
-    if (keyList == null) {
-      listOfKeys.add(subChapterkeyValue);
-      await storage.write(key: key, value: jsonEncode(listOfKeys));
-      listOfKeys.clear();
-      print('first time execute');
-    } else {
-      List<dynamic> listDataOfKeys = await jsonDecode(keyList);
-      List<String> swapKeysListOfStringType = [];
-      swapKeysListOfStringType.addAll(listDataOfKeys.cast<String>());
-      swapKeysListOfStringType.add(subChapterkeyValue);
-
-      await storage.write(key: key, value: jsonEncode(swapKeysListOfStringType));
-
-      listDataOfKeys.clear();
-      swapKeysListOfStringType.clear();
-
-      print('second time');
-      // List<String> myListU=[];
-    }
-  }
-
-  Widget numericAnswerWidget(String questionId, int index, LoginProvider loginProvider) {
-    return Container(
-      child: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('AssigningCheckListNumericOption')
-            .where('questionId', isEqualTo: questionId)
-            .where('isExpected', isEqualTo: true)
-            .snapshots(),
-        builder: (BuildContext contex, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CupertinoActivityIndicator());
-          } else if (snapshot.hasData == false) {
-            return const Center(
-              child: Text(
-                'Data not found',
-                style: TextStyle(color: Colors.red),
-              ),
-            );
-          } else {
-            return Container(
-              height: 50,
-              color: const Color(0xFFF2F2F2),
-              width: 160,
-              child: TextFormField(
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Enter value';
-                  }
-                  null;
-                  return null;
-                },
-                onChanged: (value) async {
-                  DateTime now = DateTime.now();
-
-// format the DateTime object
-                  String formattedDate = DateFormat('MMM d, yyyy – h:mm a').format(now);
-                  //String nowDate = formatter.format(now);
-                  var uuid = const Uuid().v4();
-                  int answer = int.parse(value);
-                  int max = int.parse(snapshot.data!.docs[0]['max'].toString());
-                  int min = int.parse(snapshot.data!.docs[0]['min'].toString());
-
-                  await InspectionChecklist.addDataIntoCheckListModelList(
-                      questionId.toString(),
-                      (answer > min && answer < max) ? true : false,
-                      value,
-                      loginProvider.assignmentId.toString(),
-                      uuid,
-                      formattedDate);
-                },
-                decoration: const InputDecoration(
-                    hintText: 'Enter the Value',
-                    hintStyle: TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.w400, color: Color(0xFFABAAAA), fontFamily: 'SofiaPro'),
-                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFF2F1F1))),
-                    errorBorder: InputBorder.none),
-              ),
-            );
-          }
-        },
       ),
     );
   }

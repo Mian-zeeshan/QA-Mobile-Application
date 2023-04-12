@@ -3,20 +3,22 @@ import 'package:kfccheck/common/common.dart';
 import 'package:kfccheck/common/const.dart';
 import 'package:kfccheck/common/user.dart';
 import 'package:kfccheck/components/bg.dart';
+import 'package:kfccheck/config/config.dart';
 import 'package:kfccheck/screens/inspection_screen/inspection_standards.dart';
 import 'package:provider/provider.dart';
+import '../../components/bottom_navbar.dart';
 import '../../models/branch_model.dart';
 import '../../provider/branch_provider.dart';
 import '../../services/services.dart';
 
-class Branches extends StatefulWidget {
-  const Branches({super.key});
+class AssignWalk extends StatefulWidget {
+  const AssignWalk({super.key});
 
   @override
-  State<Branches> createState() => _BranchesState();
+  State<AssignWalk> createState() => _AssignWalkState();
 }
 
-class _BranchesState extends State<Branches> {
+class _AssignWalkState extends State<AssignWalk> {
   List<dynamic> branches = [];
 
   // getData() async {
@@ -91,14 +93,15 @@ class _BranchesState extends State<Branches> {
   //     },
   //   );
   // }
-@override
+  @override
   void initState() {
-    var branch = locator.get<LocalUser>();
-    branch.clearbranchDetail();
+   var branchProvider = Provider.of<BranchProvider>(context, listen: false);
+    branch.getBranchDetail(branchProvider.branchId.toString(),branchProvider);
 
     // TODO: implement initState
     super.initState();
   }
+
   var branch = locator.get<LocalUser>();
   int groupValue = -1;
   bool isfalse = false;
@@ -107,68 +110,24 @@ class _BranchesState extends State<Branches> {
   Widget build(BuildContext context) {
     var branchProvider = Provider.of<BranchProvider>(context, listen: false);
     return Background(
-        title: 'Branches',
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: 629,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-            color: gray,
-          ),
-          child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              child: FutureBuilder<List<BranchModel>>(
-                future: branch.getBranchDetail(branchProvider.branchId.toString()),
-                builder: (context,AsyncSnapshot<List<BranchModel>> snapshot) {
-                  if(snapshot.hasData){
-                    if(snapshot.connectionState==ConnectionState.waiting){
-                      return Center(child: CircularProgressIndicator());
-                    }
-       else{
-          return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            routeTo(InspectionStandards(), context: context);
-                            // showAlertDialog(context, branches[index].id);
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                            elevation: 0,
-                            color: Colors.white,
-                            child: ListTile(
-                              leading: Image.asset('asset/MC.png'),
-                              title: Text(
-                                branch.branchDetail[index].branchName.toString(),
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Sblack),
-                              ),
-                              subtitle: Text(snapshot.data![index].branchLocation.toString()+""+ snapshot.data![index].branchCity.toString()),
-                              trailing: Text(
-                                "Last Walk: 2 days ago",
-                                style: TextStyle(color: Colors.black.withOpacity(0.5)),
-                              ),
-                            ),
-                          ),
-                        );
-                      });
-               
-       }
-        
-                  }
-                  else
-        
-                  
-                 return Container(
-                  child: Center(child: Text('no data found ',style: TextStyle(fontSize: 20),),),
-                 );
-                 
-                 
-                },
-              )),
+      title: 'Assign Walk',
+      isBranchScreen: true,
+     
+      
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 629,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          color: gray,
         ),
-        
-        isBranchScreen: true,);
+        child:Consumer<BranchProvider>(builder: (context, value, child) {
+          return  AppConfig.inspectionWalkPages[value.walkPagesIndex];
+        },)
+       
+       // child:AppConfig.inspectionWalkPages[0],
+     
+      ),
+    );
   }
 }

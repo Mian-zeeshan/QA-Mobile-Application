@@ -56,7 +56,7 @@ class InspectionComponent extends StatelessWidget {
                                 // showAlertDialog(context, branches[index].id);
 
                                 child: FutureBuilder<String>(
-                                  future: getValue(  snapshot.data!.docs[index]['id'].toString()),
+                                  future: getValue(snapshot.data!.docs[index]['id'].toString()),
                                   builder: (context, d) {
                                     return Card(
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -70,7 +70,13 @@ class InspectionComponent extends StatelessWidget {
                                               const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Sblack),
                                         ),
                                         // subtitle: Text(snapshot.data!.docs[index]['userName']),
-                                        trailing: d.data == 'true' ? Icon(Icons.check,color: Colors.green,) : const Text(''),
+
+                                        trailing: d.data == 'true'
+                                            ? Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                              )
+                                            : const Text(''),
                                       ),
                                     );
                                   },
@@ -80,11 +86,8 @@ class InspectionComponent extends StatelessWidget {
                   },
                 ))));
   }
-  Future<String> getValue(String id) async
-{
 
-  return await locator.get<LocalStorageProvider>().retrieveDataByKey(id)??'';
+  Future<String> getValue(String id) async {
+    return await locator.get<LocalStorageProvider>().retrieveDataByKey(id) ?? '';
+  }
 }
-}
-
-
