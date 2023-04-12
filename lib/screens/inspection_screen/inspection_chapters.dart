@@ -35,8 +35,8 @@ class _InspectionChaptersState extends State<InspectionChapters> {
 
   @override
   void dispose() {
-    var branch = locator.get<LocalUser>();
-    branch.clearbranchDetail();
+    // var branch = locator.get<LocalUser>();
+    // branch.clearbranchDetail();
 
     // TODO: implement dispose
     super.dispose();

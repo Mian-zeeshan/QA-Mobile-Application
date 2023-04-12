@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:kfccheck/screens/branches/branches.dart';
+import 'package:intl/intl.dart';
+import 'package:kfccheck/screens/assign_walk/assign_walk.dart';
 import 'package:provider/provider.dart';
 import '../models/branch_model.dart';
 import '../provider/branch_provider.dart';
@@ -14,19 +15,13 @@ import '../screens/qa_walk.dart';
 import '../services/services.dart';
 import 'common.dart';
 import 'local_storage_provider.dart';
+import 'package:collection/collection.dart';
 
 class LocalUser {
   late FirebaseAuth _firebaseAuth;
   late FirebaseFirestore _firebaseFirestore;
   static final LocalUser _instance = LocalUser._internal();
 
-  final List<BranchModel> _branchDetail = [];
-
-  void clearbranchDetail() {
-    _branchDetail.clear();
-  }
-
-  List<BranchModel> get branchDetail => _branchDetail;
   final List<String> _templatesIdsList = [];
   List<String> get templatesIdsList => _templatesIdsList;
 
@@ -69,16 +64,7 @@ class LocalUser {
       var authResult = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
       if (authResult.user != null) {
         Fluttertoast.showToast(msg: 'Successfully logged in');
-        // var userDoc = await FirebaseFirestore.instance.collection('users').doc(authResult.user?.uid).get();
-        // if (userDoc.exists) {
-        //   _userData = userDoc;
-        //   if (isPasswordSaved) {
-        //     await locator.get<LocalStorageProvider>().saveByKey('Email', data: email);
-        //     await locator.get<LocalStorageProvider>().saveByKey('Password', data: password);
-        //   }
-        //   Fluttertoast.showToast(msg: 'Successfully logged in');
-        //   return true;
-        // }
+
         return true;
       } else {
         Fluttertoast.showToast(msg: 'Incorrect email or password');
@@ -109,13 +95,6 @@ class LocalUser {
     }
   }
 
-  showSnackBar(context, message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-      message,
-    )));
-  }
-
   Future<User?> signInWithEmailPassword(String email, String password, BuildContext context) async {
     var loginProvider = Provider.of<LoginProvider>(context, listen: false);
     var customerProvider = Provider.of<CustomerProvider>(context, listen: false);
@@ -132,7 +111,7 @@ class LocalUser {
       // if user exist in fireauth and then check what is the role of crunnt user role in fireauth
       if (user != null) {
         String userid = user.uid;
-        await getAssignsTemplatesIdsd(context,userid);
+        await getAssignsTemplatesIdsd(context, userid);
         loginProvider.setCurrentUserId(userid);
         _firebaseFirestore.collection('Users').doc(userid).get().then((DocumentSnapshot docs) {
           final data = docs.data() as Map<String, dynamic>;
@@ -169,18 +148,16 @@ class LocalUser {
     return user;
   }
 
-  Future<List<BranchModel>> getBranchDetail(String branchId) async {
+  Future getBranchDetail(String branchId, BranchProvider branchProvider) async {
     //var userProvider = Provider.of<AddUserProvider>(context, listen: false);
-    clearbranchDetail();
+    //learbranchDetail();
     await _firebaseFirestore.collection('Branch').doc(branchId).get().then((DocumentSnapshot docs) {
       final data = docs.data() as Map<String, dynamic>;
 
-      if (_branchDetail.isEmpty) {
-        _branchDetail.add(BranchModel(
-            branchName: data['branchName'].toString(),
-            branchCity: data['branchCity'].toString(),
-            branchLocation: data['branchLocation'].toString()));
-      }
+      branchProvider.setBranchDetail(BranchModel(
+          branchName: data['branchName'].toString(),
+          branchCity: data['branchCity'].toString(),
+          branchLocation: data['branchLocation'].toString()));
 
       // _branchName = data['branchName'].toString();
       // _branchCity = data['branchCity'].toString();
@@ -188,17 +165,14 @@ class LocalUser {
       //String datam=data['customer_name'].toString();
       //userProvider.setcustomerName(name);
     });
-
-    return branchDetail;
   }
 
   Future<List<String>> getAssignsTemplatesIdsd(BuildContext context, String userid) async {
     var loginProvider = Provider.of<LoginProvider>(context, listen: false);
     try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('AssignmentTemplate')
-          .where('assignTo', isEqualTo: userid)
-          .get();
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('AssignmentTemplate').where('assignTo', isEqualTo: userid).get();
+
       for (var element in snapshot.docs) {
         String templateId = await element['templateId'];
         _templatesIdsList.add(templateId);
@@ -210,5 +184,46 @@ class LocalUser {
     return _templatesIdsList;
   }
 
+  String loginUserId(context) {
+    var loginProvider = Provider.of<LoginProvider>(context, listen: false);
+    return loginProvider.crunntUserId.toString();
+  }
 
+  String getCurrentDateTime() {
+    DateTime now = DateTime.now();
+    String nowDate = now.toIso8601String();
+    return nowDate;
+  }
+
+  Future checkTaskOverDue(String dueTime, String docId) async {
+    DateTime dueDate = DateFormat('dd-MM-yyyy hh:mm a').parse(dueTime);
+
+    DateTime currentDate = DateTime.now();
+
+    int result = currentDate.compareTo(dueDate);
+    if (result > 0) {
+     await  _firebaseFirestore.collection('AssignmentTemplate').doc(docId).update({
+        'status': 'missed',
+      });
+    }
+  }
+
+  Future<String> getBranchName(String branchId) async {
+    //  var branchProvider = Provider.of<BranchProvider>(context, listen: false);
+
+    String branchName = '';
+    await _firebaseFirestore.collection('Branch').doc(branchId).get().then((DocumentSnapshot docs) {
+      final data = docs.data() as Map<String, dynamic>;
+      String branchName = data['branchName'].toString();
+      //String datam=data['customer_name'].toString();
+    });
+    return branchName;
+  }
+}
+
+showSnackBar(context, message) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(
+    message,
+  )));
 }

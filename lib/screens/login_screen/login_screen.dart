@@ -7,7 +7,7 @@ import 'package:kfccheck/common/user.dart';
 import 'package:kfccheck/components/global_button.dart';
 import 'package:kfccheck/components/qa_scaffold.dart';
 import 'package:kfccheck/models/roles_enum.dart';
-import 'package:kfccheck/screens/branches/branches.dart';
+import 'package:kfccheck/screens/assign_walk/assign_walk.dart';
 import 'package:kfccheck/screens/qa_walk.dart';
 import 'package:kfccheck/screens/sign_up_screen.dart';
 import 'package:kfccheck/services/services.dart';
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                        
                      await   localUserHandler.signInWithEmailPassword(nameController.text, passwordController.text, context).then((value) {
 
-                      localUserHandler.showSnackBar(context, 'sucessfully login');
+                      showSnackBar(context, 'sucessfully login');
                      
                      });
 

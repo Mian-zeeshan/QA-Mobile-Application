@@ -36,8 +36,7 @@ class _InspectionSubChaptersState extends State<InspectionSubChapters> {
 
   @override
   void dispose() {
-    var branch = locator.get<LocalUser>();
-    branch.clearbranchDetail();
+  //  /ranch.clearbranchDetail();
 
     // TODO: implement dispose
     super.dispose();
@@ -68,7 +67,7 @@ class _InspectionSubChaptersState extends State<InspectionSubChapters> {
               InspectionScreen(
                 subChpId: id,
                 title: nam,
-                length: length,
+                subChaptersListLength: length,
                 standardId: widget.standardId,
                 chapterId:widget.chaptersId ,
                 chapterListLength: widget.chapterListLength,

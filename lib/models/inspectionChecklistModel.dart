@@ -62,3 +62,34 @@ class CheckListModel {
     );
   }
 }
+
+
+class TaskCompleted{
+String? assignmentId;
+String? assignTo;
+
+String? taskCompletedDate;
+bool? taskCompleted;
+
+TaskCompleted({
+  required this.assignmentId,
+  required this.assignTo,
+  
+  required this.taskCompletedDate,
+  required this.taskCompleted,
+
+});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'assignmentId': assignmentId,
+      'assignTo': assignTo,
+      
+      'taskCompletedDate': taskCompletedDate,
+      'taskCompleted': taskCompleted,
+      
+    };
+  }
+
+
+}

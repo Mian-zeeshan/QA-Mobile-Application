@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kfccheck/common/common.dart';
 import 'package:kfccheck/common/user.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,12 @@ import '../../services/services.dart';
 import 'inspection_chapters.dart';
 
 class InspectionStandards extends StatefulWidget {
+
+  String? assignStandardId;
+   InspectionStandards({super.key,
+  this.assignStandardId
+  });
+
   @override
   State<InspectionStandards> createState() => _InspectionStandardsState();
 }
@@ -30,8 +37,8 @@ class _InspectionStandardsState extends State<InspectionStandards> {
 
   @override
   void dispose() {
-    var branch = locator.get<LocalUser>();
-    branch.clearbranchDetail();
+    // var branch = locator.get<LocalUser>();
+    // branch.clearbranchDetail();
 
     // TODO: implement dispose
     super.dispose();
@@ -46,22 +53,28 @@ class _InspectionStandardsState extends State<InspectionStandards> {
     var localUserHandler = locator.get<LocalUser>();
     var branchProvider = Provider.of<BranchProvider>(context, listen: false);
     var customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+     const storage = FlutterSecureStorage();
     return InspectionComponent(
+
       collection: FirebaseFirestore.instance
           .collection('AssigningStandardsCopy')
           .where('customerId', isEqualTo: customerProvider.customerId.toString())
-          .where('id', whereIn: localUserHandler.templatesIdsList)
+          .where('id', isEqualTo: widget.assignStandardId)
+         // .where('id', whereIn: localUserHandler.templatesIdsList)
           .snapshots(),
       pageTitle: 'Standard',
       route: (id, name,length) async {
         await getAssignsTemplatesIdsd(context, id);
           String? isAttempt;
         isAttempt = await locator.get<LocalStorageProvider>().retrieveDataByKey(id);
-        if(isAttempt=='true'){}
+        if(isAttempt=='true'){
+         // await   storage.deleteAll();
+        }
         else{routeTo(InspectionChapters(standardId: id,), context: context);}
         
       },
     );
+    
   }
 
   Future getAssignsTemplatesIdsd(BuildContext context, String id) async {

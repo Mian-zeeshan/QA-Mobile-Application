@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kfccheck/common/const.dart';
 import 'package:kfccheck/screens/admin/admindashboard.dart';
 import 'package:kfccheck/screens/qa_walk.dart';
 
 class Done extends StatelessWidget {
+
+  var storage = FlutterSecureStorage();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +50,8 @@ class Done extends StatelessWidget {
                         child: const Image(
                           image: AssetImage('asset/forward.png'),
                         ),
-                        onTap: () {
+                        onTap: () async{
+                            await   storage.deleteAll();
                           Navigator.push(context, MaterialPageRoute(builder: (context) => QA_walk()));
                         },
                       ),
