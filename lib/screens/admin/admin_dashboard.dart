@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:kfccheck/common/const.dart';
 import 'package:kfccheck/screens/actions.dart';
+import 'package:kfccheck/screens/admin/admin_dashboard_screen.dart';
 import 'package:kfccheck/screens/anomalies.dart';
 import 'package:kfccheck/screens/report_emergency.dart';
-class NavigationBarScreen extends StatefulWidget {
-  const NavigationBarScreen({Key? key}) : super(key: key);
+class AdminDashboard extends StatefulWidget {
+  const AdminDashboard({Key? key}) : super(key: key);
   @override
-  State<NavigationBarScreen> createState() => _NavigationBarScreenState();
+  State<AdminDashboard> createState() => _AdminDashboardState();
 }
-class _NavigationBarScreenState extends State<NavigationBarScreen> {
+class _AdminDashboardState extends State<AdminDashboard> {
   int _currentIndex = 0;
   List<Widget> pages = [
+  AdminDashboardScreen(),
      Report(),
     ActionScreen(),
      Anomalies(),
@@ -23,7 +25,8 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
         body: Center(
           child: pages[_currentIndex],
         ),
-        bottomNavigationBar: NavigationBarTheme(
+        bottomNavigationBar: 
+        NavigationBarTheme(
           data: NavigationBarThemeData(
             labelTextStyle: MaterialStateProperty.all(
               const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
@@ -37,15 +40,20 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
               });
             },
             destinations: const [
+               NavigationDestination(
+                icon: Icon(Icons.home,size: 25,),
+                label: 'Home',
+              ),
               NavigationDestination(
-                icon: Icon(Icons.warning_amber_sharp,color: white,size: 25,),
+                icon: Icon(Icons.warning_amber_sharp,color: black,size: 25,),
                 label: 'Emergencies',
               ),
               NavigationDestination(
-               icon: ImageIcon(AssetImage('asset/actions.png'),size: 25,),
+               icon: ImageIcon(AssetImage('asset/actions.png'),size: 25,color: Colors.black),
                 label: 'Actions',
               ),
               NavigationDestination(
+
                 icon: ImageIcon(AssetImage('asset/anomalies.png'),size: 25,),
                 label: 'Anomalies',
               ),

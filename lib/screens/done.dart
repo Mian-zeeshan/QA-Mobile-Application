@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kfccheck/common/const.dart';
-import 'package:kfccheck/screens/admin/admindashboard.dart';
+import 'package:kfccheck/screens/admin/admin_dashboard_screen.dart';
 import 'package:kfccheck/screens/qa_walk.dart';
 
 class Done extends StatelessWidget {

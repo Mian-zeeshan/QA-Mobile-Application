@@ -91,7 +91,7 @@ class _Report extends State<Report> {
                                         child: ListTile(
                                           title: Text(emergencies[index]),
                                           trailing: Radio<int>(
-                                            value: answers[index]!,
+                                            value: answers[index],
                                             groupValue: groupValue,
                                             onChanged: (value) {
                                               setState(() {
