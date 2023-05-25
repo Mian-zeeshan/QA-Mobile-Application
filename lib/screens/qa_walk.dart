@@ -256,7 +256,9 @@ class _QA_walkState extends State<QA_walk> {
                     child: CircularPercentIndicator(
                       radius: 40,
                       lineWidth: 20.0,
-                      percent: value.branchCompletedWalk!.toDouble() / value.branchTotalWalk!.toDouble(),
+                        percent: value.branchCompletedWalk==null  || value.branchTotalWalk == null? 0 :
+                       (value.branchCompletedWalk!  / value.branchTotalWalk!) ,
+                     // percent: value.branchCompletedWalk!.toDouble() / value.branchTotalWalk!.toDouble(),
                       //snapshot.hasData? double.parse('0.'+snapshot.data.toString()):0.0,
                       animation: true,
                       backgroundColor: lightgray,
