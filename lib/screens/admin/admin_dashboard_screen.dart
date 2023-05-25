@@ -14,19 +14,18 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../common/user.dart';
-import '../components/qa_scaffold.dart';
-import '../config/config.dart';
-import '../services/services.dart';
+import '../../components/qa_scaffold.dart';
+import '../../config/config.dart';
+import 'admin_dashboard.dart';
 
-class QA_walk extends StatefulWidget {
-  const QA_walk({super.key});
+class AdminDashboardScreen extends StatefulWidget {
+  const AdminDashboardScreen({super.key});
 
   @override
-  State<QA_walk> createState() => _QA_walkState();
+  State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
 }
 
-class _QA_walkState extends State<QA_walk> {
+class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   DateTime? Date;
   bool isFieldShow = false;
 
@@ -49,10 +48,14 @@ class _QA_walkState extends State<QA_walk> {
   }
 
   List<String> _branches = [
-
+    'KFC Johar Town',
+    'KFC Township',
+    'KFC DHA',
+    'KFC Gulberg',
+    'KFC Bahria Town',
+    'KFC Emporium Mall'
   ];
 
-  final _tooltip = TooltipBehavior(enable: true);
   String? _selectedbranches = null;
   showAlertDialog(BuildContext context) {
     AlertDialog alert = AlertDialog(
@@ -70,7 +73,7 @@ class _QA_walkState extends State<QA_walk> {
                   height: 48,
                   decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(4)), color: GRay),
                   child: const Center(
-                      child: Text(
+                      child: Text( 
                     'Cancel',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: white),
                   )),
@@ -96,7 +99,7 @@ class _QA_walkState extends State<QA_walk> {
                   )),
                 ),
                 onTap: () {
-                  routeTo(const LoginScreen(), context: context, clearStack: true);
+                  routeTo(LoginScreen(), context: context,clearStack: true);
                 },
               ),
             ),
@@ -116,20 +119,16 @@ class _QA_walkState extends State<QA_walk> {
   final User = FirebaseAuth.instance.currentUser;
   final formKey = GlobalKey<FormState>();
 
-  final List<ChartData> chartDummyData = [
-    ChartData('week 1', 1),
-    ChartData('week 2', 1),
-    ChartData('week 3', 1),
-    ChartData('week 4', 1),
+   List<AdminChartData> chartDummyData = [
+    AdminChartData('week 1', 1),
+    AdminChartData('week 2', 1),
+    AdminChartData('week 3', 1),
+    AdminChartData('week 4', 1),
   ];
   var storage = const FlutterSecureStorage();
-  var localUserHandler = locator.get<LocalUser>();
   @override
   void initState() {
-    AppConfig.getBranchCompletedWalk(context);
-    AppConfig.getWalkDetailByWeek(context);
-    localUserHandler.getBranchName( context);
-    
+    // AppConfig.getWalkDetailByWeek(context);
 
     // TODO: implement initState
     super.initState();
@@ -137,7 +136,6 @@ class _QA_walkState extends State<QA_walk> {
 
   @override
   Widget build(BuildContext context) {
-     var branchProvider = Provider.of<BranchProvider>(context, listen: false);
     return WillPopScope(
       onWillPop: () async {
         final shouldPop = await showDialog<bool>(
@@ -167,14 +165,6 @@ class _QA_walkState extends State<QA_walk> {
         return shouldPop!;
       },
       child: QaScaffold(
-        button: GlobalButton(
-          title: 'Start QA Walk',
-          onTap: () async {
-            showReportEmergecyAlertDialog(context);
-            // await   storage.deleteAll();
-           // routeTo(const AssignWalk(), context: context);
-          },
-        ),
         child: SingleChildScrollView(
           child: Column(children: [
             Stack(children: [
@@ -194,10 +184,10 @@ class _QA_walkState extends State<QA_walk> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           GestureDetector(
-                            child:  Text(
+                            child: const Text(
                               // 'Hello ${locator.get<LocalUser>().userData['firstName']}',
-                              'Hello ${(localUserHandler.loginUserName)![0].toUpperCase()+ (localUserHandler.loginUserName)!.substring(1)}!',
-                              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w500, color: yellow,fontFamily: 'SofiaPro'),
+                              'Helo',
+                              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: yellow),
                             ),
                           ),
                           GestureDetector(
@@ -208,11 +198,11 @@ class _QA_walkState extends State<QA_walk> {
                                 shape: BoxShape.circle,
                                 color: GREEN,
                               ),
-                              child:  Center(
+                              child: const Center(
                                   child: Text(
                                 // locator.get<LocalUser>().userData['firstName'][0],
-                               localUserHandler.loginUserName!.substring(0,1).toUpperCase().toString() ,
-                                style: const TextStyle(
+                                'zeeshan',
+                                style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.w400, color: Color.fromRGBO(51, 51, 51, 1)),
                               )),
                             ),
@@ -249,16 +239,15 @@ class _QA_walkState extends State<QA_walk> {
                   ),
                 ),
               ),
-              Consumer<BranchProvider>(
+             Consumer<BranchProvider>(
                 builder: (context, value, child) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 219, left: 150),
                     child: CircularPercentIndicator(
                       radius: 40,
                       lineWidth: 20.0,
-                        percent: value.branchCompletedWalk==null  || value.branchTotalWalk == null? 0 :
+                      percent: value.branchCompletedWalk==null  || value.branchTotalWalk == null? 0 :
                        (value.branchCompletedWalk!  / value.branchTotalWalk!) ,
-                     // percent: value.branchCompletedWalk!.toDouble() / value.branchTotalWalk!.toDouble(),
                       //snapshot.hasData? double.parse('0.'+snapshot.data.toString()):0.0,
                       animation: true,
                       backgroundColor: lightgray,
@@ -281,6 +270,7 @@ class _QA_walkState extends State<QA_walk> {
               )
             
             
+           
             ]),
             const SizedBox(
               height: 20,
@@ -309,41 +299,11 @@ class _QA_walkState extends State<QA_walk> {
                           width: 30,
                         ),
                         Container(
-                          height: 30,
-                          width: 185,
-                          decoration:
-                              const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(6)), color: light),
-                          child: DropdownButton(
-                            hint:  Padding(
-                              padding: const EdgeInsets.only(left: 5),
-                              child: Text(
-                                branchProvider.branchName.toString(),
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: lighht),
-                              ),
-                            ),
-                            underline: Container(),
-                            iconSize: 25,
-                            icon: const Padding(
-                              padding: EdgeInsets.only(right: 15),
-                              child: Icon(
-                                Icons.arrow_drop_down,
-                                color: Black,
-                              ),
-                            ),
-                            value: _selectedbranches,
-                            onChanged: (newValue) {
-                              setState(() {
-                                _selectedbranches = newValue!;
-                              });
-                            },
-                            items: _branches.map((e) {
-                              return DropdownMenuItem(
-                                value: e,
-                                child: Text(e),
-                              );
-                            }).toList(),
-                          ),
-                        )
+                            height: 30,
+                            width: 185,
+                            decoration:
+                                const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(6)), color: light),
+                            child: AppConfig.branchesDropDownWidget(context))
                       ],
                     ),
                   ),
@@ -359,13 +319,13 @@ class _QA_walkState extends State<QA_walk> {
                                 arrangeByIndex: false,
                                 //rangePadding: ChartRangePadding.additional
                               ),
-                              series: <ChartSeries<ChartData, String>>[
-                                ColumnSeries<ChartData, String>(
+                              series: <ChartSeries<AdminChartData, String>>[
+                                ColumnSeries<AdminChartData, String>(
                                     // isTrackVisible: true,
                                     color: GRAY,
-                                    dataSource: value.chartData,
-                                    xValueMapper: (ChartData data, String) => data.x,
-                                    yValueMapper: (ChartData data, int) => data.y)
+                                    dataSource:  value.adminChartData ,
+                                    xValueMapper: (AdminChartData data, String) => data.x,
+                                    yValueMapper: (AdminChartData data, int) => data.y)
                               ]),
                         ),
                       );
@@ -373,12 +333,13 @@ class _QA_walkState extends State<QA_walk> {
                   )
                 
                 
-                
+               
                 ]),
               ),
             ),
           ]),
         ),
+       // bottomNavBar: NavigationBarScreen(),
       ),
     );
   }

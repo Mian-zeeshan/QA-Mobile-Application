@@ -11,6 +11,8 @@ import '../provider/branch_provider.dart';
 import '../provider/customer_provider.dart';
 import '../provider/globel_provider.dart';
 import '../provider/login_provider.dart';
+import '../screens/admin/admin_dashboard.dart';
+import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/qa_walk.dart';
 import '../services/services.dart';
 import 'common.dart';
@@ -30,6 +32,12 @@ class LocalUser {
   UserCredential? get user => _user;
 
   dynamic _userData;
+
+  String? _loginUserName;
+ String? get loginUserName => _loginUserName;
+
+// set userName(String value) => this._userName = value;
+
 
   dynamic get userData => _userData;
   String? _branchName;
@@ -95,54 +103,53 @@ class LocalUser {
     }
   }
 
-  Future<User?> signInWithEmailPassword(String email, String password, BuildContext context) async {
-    var loginProvider = Provider.of<LoginProvider>(context, listen: false);
-    var customerProvider = Provider.of<CustomerProvider>(context, listen: false);
-    var branchProvider = Provider.of<BranchProvider>(context, listen: false);
+  Future<User?> signInWithEmailPassword(String email, String password, BuildContext context,
+      LoginProvider loginProvider, CustomerProvider customerProvider, BranchProvider branchProvider) async {
     await Firebase.initializeApp();
     User? user;
-    // this function use for sign in by using firebase auth
+
     try {
       UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
       user = userCredential.user;
-      // if user exist in fireauth and then check what is the role of crunnt user role in fireauth
+
       if (user != null) {
         String userid = user.uid;
-        await getAssignsTemplatesIdsd(context, userid);
+
         loginProvider.setCurrentUserId(userid);
         _firebaseFirestore.collection('Users').doc(userid).get().then((DocumentSnapshot docs) {
           final data = docs.data() as Map<String, dynamic>;
           String role = data['userRole'];
           String customerId = data['customerId'].toString();
           String userName = data['userName'];
-
-          // these setter function usered for setting userer related data
           customerProvider.setcustomerId(customerId);
-
-          User? user = FirebaseAuth.instance.currentUser;
-          String currentUserId = user!.uid.toString();
-
+            _loginUserName=userName;
           loginProvider.setLoginUserName(userName);
-          loginProvider.setCurrentUserId(currentUserId);
+
           if (role == 'admin') {
-            loginProvider.setLoginUserRole('Customer Admin');
+            routeTo(const AdminDashboard(), context: context,clearStack: true);
+            loginProvider.setIsLogin(false);
+            Fluttertoast.showToast(msg: 'sucessfully login');
           } else if (role == 'brancAdminUser') {
-            String branchId = data['branchid'];
-            branchProvider.setBranchId(branchId);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const QA_walk()),
-            );
+            branchProvider.setBranchId(data['branchid'].toString());
+            routeTo(const QA_walk(), context: context,clearStack: true);
+            loginProvider.setIsLogin(false);
+
+            Fluttertoast.showToast(msg: 'sucessfully login');
           }
         });
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
+        Fluttertoast.showToast(msg: 'User not found');
+        //showSnackBar(context, 'User not found');
       } else if (e.code == 'wrong-password') {
-      } else {}
+        Fluttertoast.showToast(msg: 'wrong email & password');
+      } else {
+        Fluttertoast.showToast(msg: 'Something went wrong');
+      }
     }
 
     return user;
@@ -158,31 +165,25 @@ class LocalUser {
           branchName: data['branchName'].toString(),
           branchCity: data['branchCity'].toString(),
           branchLocation: data['branchLocation'].toString()));
-
-      // _branchName = data['branchName'].toString();
-      // _branchCity = data['branchCity'].toString();
-      // _branchLocation = data['branchLocation'].toString();
-      //String datam=data['customer_name'].toString();
-      //userProvider.setcustomerName(name);
     });
   }
 
-  Future<List<String>> getAssignsTemplatesIdsd(BuildContext context, String userid) async {
-    var loginProvider = Provider.of<LoginProvider>(context, listen: false);
-    try {
-      QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('AssignmentTemplate').where('assignTo', isEqualTo: userid).get();
+  // Future<List<String>> getAssignsTemplatesIdsd(BuildContext context, String userid) async {
+  //   var loginProvider = Provider.of<LoginProvider>(context, listen: false);
+  //   try {
+  //     QuerySnapshot snapshot =
+  //         await FirebaseFirestore.instance.collection('AssignmentTemplate').where('assignTo', isEqualTo: userid).get();
 
-      for (var element in snapshot.docs) {
-        String templateId = await element['templateId'];
-        _templatesIdsList.add(templateId);
-      }
-    } catch (e) {
-      showSnackBar(context, e.toString());
-    }
+  //     for (var element in snapshot.docs) {
+  //       String templateId = await element['templateId'];
+  //       _templatesIdsList.add(templateId);
+  //     }
+  //   } catch (e) {
+  //     showSnackBar(context, e.toString());
+  //   }
 
-    return _templatesIdsList;
-  }
+  //   return _templatesIdsList;
+  // }
 
   String loginUserId(context) {
     var loginProvider = Provider.of<LoginProvider>(context, listen: false);
@@ -202,22 +203,24 @@ class LocalUser {
 
     int result = currentDate.compareTo(dueDate);
     if (result > 0) {
-     await  _firebaseFirestore.collection('AssignmentTemplate').doc(docId).update({
+      await _firebaseFirestore.collection('AssignmentTemplate').doc(docId).update({
         'status': 'missed',
       });
     }
   }
 
-  Future<String> getBranchName(String branchId) async {
-    //  var branchProvider = Provider.of<BranchProvider>(context, listen: false);
+  Future getBranchName(context) async {
+    //
+      var branchProvider = Provider.of<BranchProvider>(context, listen: false);
 
     String branchName = '';
-    await _firebaseFirestore.collection('Branch').doc(branchId).get().then((DocumentSnapshot docs) {
+    await _firebaseFirestore.collection('Branch').doc(branchProvider.branchId).get().then((DocumentSnapshot docs) {
       final data = docs.data() as Map<String, dynamic>;
       String branchName = data['branchName'].toString();
+         branchProvider.setBranchName(branchName);
       //String datam=data['customer_name'].toString();
     });
-    return branchName;
+    
   }
 }
 

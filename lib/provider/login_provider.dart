@@ -37,4 +37,12 @@ class LoginProvider with ChangeNotifier {
     notifyListeners();
   }
 
+    bool _isLogin=false;
+ bool get isLogin => _isLogin;
+
+ void setIsLogin( value) {_isLogin = value;
+ notifyListeners();
+ }
+
+
 }

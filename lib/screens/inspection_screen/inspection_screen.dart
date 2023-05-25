@@ -245,7 +245,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                                 },
                                               ))
                                           : snapshot.data!.docs[index]['DataType'] == 'Numeric'
-                                              ? AppConfig.numericAnswerWidget(
+                                              ? AppConfig.numericOptionAnswerWidget(
                                                   snapshot.data!.docs[index]['questionId'], index, loginProvider)
                                               : snapshot.data!.docs[index]['DataType'] == 'Boolean'
                                                   ? SizedBox(

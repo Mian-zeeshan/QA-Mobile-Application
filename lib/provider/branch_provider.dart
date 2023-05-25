@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+import '../config/config.dart';
 import '../models/branch_model.dart';
 import '../screens/qa_walk.dart';
 
@@ -40,6 +42,20 @@ class BranchProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  List<AdminChartData> _adminChartData = [];
+  List<AdminChartData> get adminChartData => _adminChartData;
+
+  void setadminChartData(value) {
+    _adminChartData.add(value);
+    notifyListeners();
+  }
+
+  void clearadminChartData() {
+    _adminChartData.clear();
+    notifyListeners();
+  }
+
+//this getter and setter use for navigat walk pages
   int _walkPagesIndex = 0;
   int get walkPagesIndex => _walkPagesIndex;
 
@@ -49,6 +65,8 @@ class BranchProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  //getter and setter use getting the branch detail
+
   final List<BranchModel> _branchDetail = [];
   List<BranchModel> get branchDetail => _branchDetail;
 
@@ -57,8 +75,32 @@ class BranchProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void clearBranchDetail(){
+  void clearBranchDetail() {
     _branchDetail.clear();
     notifyListeners();
   }
+
+  int? _branchTotalWalk;
+  int? get branchTotalWalk => _branchTotalWalk;
+
+  void setBranchTotalWalk(int? value) {
+    _branchTotalWalk = value;
+
+    notifyListeners();
+  }
+
+  int? _branchCompletedWalk;
+  int? get branchCompletedWalk => _branchCompletedWalk;
+
+  void setBranchCompletedWalk(int? value) {
+    _branchCompletedWalk = value;
+
+    notifyListeners();
+  }
+}
+
+class AdminChartData {
+  AdminChartData(this.x, this.y);
+  final String x;
+  final int y;
 }
